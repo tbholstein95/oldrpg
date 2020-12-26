@@ -26,10 +26,12 @@ public class Scenario : MonoBehaviour
     private int CatHP;
     private int CatCharisma;
     private bool IsCatSaved = false;
+    private string CatName;
 
     //Mock Player Info
     private int PlayerStrength;
     private int PlayerCharisma;
+    private int PlayerWisdom;
     private int PlayerAttackCards;
     private int PlayerInteractCards;
     private int PlayerInfoCards;
@@ -39,13 +41,16 @@ public class Scenario : MonoBehaviour
     {
         CatHP = 1;
         CatCharisma = 9;
+        CatName = "Todward";
+
         PlayerStrength = 5;
         PlayerCharisma = 20;
+        PlayerWisdom = 10;
         PlayerAttackCards = 0;
         PlayerInteractCards = 2;
         PlayerInfoCards = 2;
         PlayerSupportCards = 0;
-        ScenarioText.text = "Man there is a dang ol' cat stuck in the tree";
+        ScenarioText.text = "Man there is a dang ol' cat stuck in the tree\n";
         DrawCards();
     }
 
@@ -62,13 +67,13 @@ public class Scenario : MonoBehaviour
         }
     }
 
-
     public void DrawCards()
     {
         Debug.Log("Drawing Cards");
         //Get number of cards for each time, then generate on the screen what their options are.
         Option1.onClick.AddListener(Attack);
         Option2.onClick.AddListener(Interact);
+        Option3.onClick.AddListener(GatherInfo);
         Option1.GetComponentInChildren<Text>().text = "Attack";
         Option2.GetComponentInChildren<Text>().text = "Interact";
         Option3.GetComponentInChildren<Text>().text = "Gather Info";
@@ -91,8 +96,7 @@ public class Scenario : MonoBehaviour
         Debug.Log("Player Interacting with Target");
         Debug.Log("Cat Charsima = " + CatCharisma);
         Debug.Log("Player Charisma =" + PlayerCharisma);
-        bool charismaCheck = PlayerCharisma > CatCharisma;
-        if (charismaCheck){
+        if (PassDC(CatCharisma, PlayerCharisma)){
             ScenarioText.text = "You've persuaded the cat to climb down. He purrs warmly in your arms.\n";
             IsCatSaved = true;
             
@@ -105,7 +109,15 @@ public class Scenario : MonoBehaviour
 
     private void GatherInfo()
     {
-        return;
+        Debug.Log("Player Gathering Info On Cat");
+        if (PassDC(CatCharisma, PlayerWisdom))
+        {
+            ScenarioText.text += string.Format("The cat's name is {0}", CatName);
+        }
+        else
+        {
+            ScenarioText.text += "You don't know what this cat's name is";
+        }
     }
 
     private void Support()
@@ -134,5 +146,10 @@ public class Scenario : MonoBehaviour
     private void EndGame()
     {
         IsCatSaved = false;
+    }
+
+    private bool PassDC(int dc, int playerStat)
+    {
+        return playerStat >= dc;
     }
 }
