@@ -8,7 +8,6 @@ public class Client : MonoBehaviour
 {
     public Text ScenarioText;
 
-
     public Button AttackOption;
     public Button InteractOption;
     public Button GatherInfoOption;
@@ -18,16 +17,19 @@ public class Client : MonoBehaviour
 
     void Start()
     {
+        Debug.Log("Starting client");
+        Player = new Player();
+
         Scenario = new Scenario();
         Scenario.AddClientToList(this);
-        Player = new Player();
-        Debug.Log("Started Client");
+        DisplayCards();
 
+        // TODO: Add confirmation all players are connected, let player decide when to start scenario
+        Scenario.StartScenario();
     }
 
     void Update()
     {
-        Scenario.ScenarioUpdate();
     }
 
     public void SetScenarioText(string text)
@@ -48,6 +50,25 @@ public class Client : MonoBehaviour
         SupportOption.onClick.AddListener(Support);
         SetSupportOptionText("Support");
     }
+
+    public void DisableButtons()
+    {
+        Debug.Log("Disabling buttons for client");
+        AttackOption.enabled = false;
+        InteractOption.enabled = false;
+        GatherInfoOption.enabled = false;
+        SupportOption.enabled = false;
+    }
+
+    public void EnableButtons()
+    {
+        Debug.Log("Enabling buttons for client");
+        AttackOption.enabled = true;
+        InteractOption.enabled = true;
+        GatherInfoOption.enabled = true;
+        SupportOption.enabled = true;
+    }
+
     public void SetAttackOptionText(string text)
     {
         AttackOption.GetComponentInChildren<Text>().text = text;
@@ -70,25 +91,21 @@ public class Client : MonoBehaviour
 
     private void Attack()
     {
-        Scenario.SetActiveClient(this);
         Scenario.Attack(this);
     }
 
     private void Interact()
     {
-        Scenario.SetActiveClient(this);
         Scenario.Interact(this);
     }
 
     private void GatherInfo()
     {
-        Scenario.SetActiveClient(this);
         Scenario.GatherInfo(this);
     }
 
     private void Support()
     {
-        Scenario.SetActiveClient(this);
         Scenario.Support(this);
     }
 

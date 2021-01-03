@@ -17,7 +17,6 @@ public class Scenario
     ///
     Dictionary<Client, int> ClientList = new Dictionary<Client, int>();
     
-    //TODO: Create initiative order.  Perhaps toggle bools that toggle a blank canvas that prevents clicking for those whose turn it is not.  Assign initiative to clients and select them.
 
     //ScenarioInfo
     private int CatHP;
@@ -40,15 +39,59 @@ public class Scenario
 
     public Scenario()
     {
-        Debug.Log("Creating Scenario");
     }
 
     public void StartScenario()
     {
+        Debug.Log("Starting scenario");
+
         CatHP = 4;
         CatCharisma = 9;
         CatName = "Todward";
         Broadcast("There is a cat stuck up in the dang ol tree down the hollar");
+
+        StartGame();
+    }
+
+    private void StartGame()
+    {
+        //TODO: Create initiative order. Perhaps toggle bools that toggle a blank canvas that prevents clicking for those whose turn it is not.  Assign initiative to clients and select them.
+
+        foreach (Client client in ClientList.Keys)
+        {
+            GiveTurn(client);
+            ScenarioUpdate();
+        }
+    }
+
+    private void GiveTurn(Client client)
+    {
+        UpdateCards(client);
+
+        client.EnableButtons();
+
+        // TODO: Wait for and act on player input
+
+        client.DisableButtons();
+    }
+
+    private void UpdateCards(Client client)
+    {
+        if (PlayerInRange(client))
+        {
+            client.SetInteractOptionText("Grab Kitty");
+        }
+
+        if (ClientGrabbedCat == client)
+        {
+            client.SetSupportOptionText("Climb back down tree with one arm");
+        }
+
+        if (ClientOnGroundWithCat == client)
+        {
+            client.SetSupportOptionText("Set the kitty down");
+        }
+
     }
 
     public void ScenarioUpdate()
@@ -61,25 +104,6 @@ public class Scenario
         {
             ScenarioSuccess();
         }
-
-        foreach (Client client in ClientList.Keys)
-        {
-            if (PlayerInRange(client))
-            {
-                client.SetInteractOptionText("Grab Kitty");
-            }
-            if (ClientGrabbedCat == client)
-            {
-                client.SetSupportOptionText("Climb back down tree with one arm");
-            }
-            if (ClientOnGroundWithCat == client)
-            {
-                client.SetSupportOptionText("Set the kitty down");
-            }
-        }
-
-        WaitForPlayerTurn();
-        ActiveClient = null;
     }
 
     public void Attack(Client client)
@@ -187,7 +211,7 @@ public class Scenario
 
     private bool isCatAlive()
     {
-        return CatHP > 0;
+        return CatHP <= 0;
     }
 
     private void ScenarioFailure()
@@ -206,6 +230,11 @@ public class Scenario
     private void EndGame()
     {
         IsCatSaved = false;
+        
+        foreach (Client client in ClientList.Keys)
+        {
+            client.DisableButtons();
+        }
     }
 
     private bool PassDC(int dc, int playerStat)
@@ -216,29 +245,6 @@ public class Scenario
     private bool PlayerInRange(Client client)
     {   
         return ClientList[client] >= 20;
-    }
-
-    private void WaitForPlayerTurn()
-    {
-        ReceiveActiveClient = true;
-        Debug.Log("Oh we loopin boi");
-
-/*        while (ActiveClient == null)
-        {
-            // Do nothing
-            Debug.Log("Waiting for Player");
-        }*/
-        Debug.Log(ActiveClient);
-    }
-
-    public void SetActiveClient(Client client)
-    {
-        if (ReceiveActiveClient)
-        {
-            ActiveClient = client;
-            ReceiveActiveClient = false;
-        }
-        
     }
 
     private void Broadcast(string text)

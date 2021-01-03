@@ -16,12 +16,11 @@ public class Player
     private int InfoCards;
     private int SupportCards;
 
-
     public Player()
     {
         SetTestPlayerStats();
-        Debug.Log("Created a player");
     }
+
     private void SetTestPlayerStats()
     {
         Name = "Franklin Turtle";
@@ -40,6 +39,7 @@ public class Player
     {
         return Strength;
     }
+
     private void SetStrength(int value)
     {
         Strength = value;
