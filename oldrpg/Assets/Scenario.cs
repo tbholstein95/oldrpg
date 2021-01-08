@@ -16,6 +16,8 @@ public class Scenario
     /// </summary>
     ///
     Dictionary<Client, int> ClientList = new Dictionary<Client, int>();
+
+    private bool working;
     
 
     //ScenarioInfo
@@ -37,6 +39,8 @@ public class Scenario
     private bool ReceiveActiveClient = false;
     private Client ActiveClient = null;
 
+    public string QuestIntro = "There is a cat stuck up in the dang ol tree down the hollar";
+
     public Scenario()
     {
     }
@@ -48,7 +52,7 @@ public class Scenario
         CatHP = 4;
         CatCharisma = 9;
         CatName = "Todward";
-        Broadcast("There is a cat stuck up in the dang ol tree down the hollar");
+        /*Broadcast("There is a cat stuck up in the dang ol tree down the hollar");*/
 
         StartGame();
     }
@@ -59,8 +63,11 @@ public class Scenario
 
         foreach (Client client in ClientList.Keys)
         {
+            working = true;
             GiveTurn(client);
-            ScenarioUpdate();
+            /*EndTurn(client);*/
+            /*ScenarioUpdate();*/
+
         }
     }
 
@@ -69,9 +76,19 @@ public class Scenario
         UpdateCards(client);
 
         client.EnableButtons();
-
         // TODO: Wait for and act on player input
 
+
+        TestMe();
+
+
+
+        /*        client.DisableButtons();*/
+    }
+
+    public void EndTurn(Client client)
+    {
+        Debug.Log("End Turn Disable Buttons");
         client.DisableButtons();
     }
 
@@ -96,6 +113,7 @@ public class Scenario
 
     public void ScenarioUpdate()
     {
+        Debug.Log("ScenarioUpdate");
         if (!isCatAlive())
         {
             ScenarioFailure();
@@ -115,9 +133,9 @@ public class Scenario
         }
         else
         {
-            Player getPlayer = client.GetPlayer();
+            /*Player getPlayer = client.GetPlayer();*/
 
-            CatHP = CatHP - getPlayer.GetStrength();
+            /*CatHP = CatHP - getPlayer.GetStrength();*/
             if (isCatAlive())
             {
                 client.SetScenarioText("Cat has lived. He coming at you now. Run.");
@@ -127,7 +145,7 @@ public class Scenario
 
     public void Interact(Client client)
     {
-        Player getPlayer = client.GetPlayer();
+        /*Player getPlayer = client.GetPlayer();*/
         Debug.Log("Player Interacting with Target");
 
         if (PlayerInRange(client))
@@ -137,10 +155,10 @@ public class Scenario
             return;
         }
         
-        else if (PassDC(CatCharisma, getPlayer.GetCharisma())){
+/*        else if (PassDC(CatCharisma, getPlayer.GetCharisma())){
             client.SetScenarioText("You've persuaded the cat to climb down. He purrs warmly in your arms.\n");
             IsCatSaved = true;
-        }
+        }*/
         else
         {
             client.SetScenarioText("Player attempts to get the kitty to come down. Alas, the cat is stubborn and isn't leaving");
@@ -149,16 +167,16 @@ public class Scenario
 
     public void GatherInfo(Client client)
     {
-        Player getPlayer = client.GetPlayer();
+        /*Player getPlayer = client.GetPlayer();*/
         if (ClientClimbingTree == null)
         {
             client.SetScenarioText("The cat appears to be 20 feet up at the top branch of the tree\n");
         }
-        Debug.Log("Player Gathering Info On Cat");
-        if (PassDC(CatCharisma, getPlayer.GetWisdom()) && PlayerInRangeOfCat == client)
+        /*Debug.Log("Player Gathering Info On Cat");*/
+/*        if (PassDC(CatCharisma, getPlayer.GetWisdom()) && PlayerInRangeOfCat == client)
         {
             client.SetScenarioText(client.ScenarioText.text += string.Format("The cat's name is {0}\n", CatName));
-        }
+        }*/
         else
         {
             client.SetScenarioText(client.ScenarioText.text += "There's not much else to know\n");
@@ -247,7 +265,7 @@ public class Scenario
         return ClientList[client] >= 20;
     }
 
-    private void Broadcast(string text)
+    public void Broadcast(string text)
     {
         foreach (Client client in ClientList.Keys)
         {
@@ -255,8 +273,25 @@ public class Scenario
         }
     }
 
+
+
+
     public void AddClientToList(Client client)
     {
         ClientList.Add(client, 0);
+    }
+
+    public IEnumerator DoLast(bool working)
+    {
+        while (working)
+        {
+            yield return new WaitForSeconds(0.1f);
+        }
+        Debug.Log("Workin");
+    }
+
+    public void TestMe()
+    {
+        Debug.Log("Dang");
     }
 }
