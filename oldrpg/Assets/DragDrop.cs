@@ -11,9 +11,11 @@ public class DragDrop : NetworkBehaviour
     private bool isOverDropZone = false;
     public GameObject DropZone;
     public PlayerManager PlayerManager;
+    public GameManager GameManager;
     // Start is called before the first frame update
     void Start()
     {
+        GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         DropZone = GameObject.Find("DropZone");
         if (!hasAuthority)
         {
@@ -62,11 +64,22 @@ public class DragDrop : NetworkBehaviour
         isDragging = false;
         if (isOverDropZone)
         {
-            transform.SetParent(DropZone.transform, false);
-            isDraggable = false;
             NetworkIdentity networkIdentity = NetworkClient.connection.identity;
             PlayerManager = networkIdentity.GetComponent<PlayerManager>();
-            PlayerManager.PlayCard(gameObject);
+            Debug.Log(PlayerManager.PlayerID + "player id");
+            Debug.Log(GameManager.GetCurrentPlayer() + "current player id");
+            if(PlayerManager.PlayerID == GameManager.GetCurrentPlayer())
+            {
+                transform.SetParent(DropZone.transform, false);
+                isDraggable = false;
+                PlayerManager.PlayCard(gameObject);
+            }
+            else
+            {
+                transform.position = startPosition;
+            }
+            
+            
         }
         else
         {

@@ -45,6 +45,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0dbe7887b0e7cd4598c167832880078, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  PlayerList: 
+  GameState: Initialize {}
 --- !u!114 &2109773607550404413
 MonoBehaviour:
   m_ObjectHideFlags: 0

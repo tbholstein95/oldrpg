@@ -14,15 +14,17 @@ public class PlayerManager : NetworkBehaviour
     public bool isMyTurn = false;
     public int PlayerID;
     List<GameObject> cards = new List<GameObject>();
-
+    public bool AllowDraw = true;
+    public GameObject button;
 
     public override void OnStartClient()
     {
-        GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         base.OnStartClient();
+        GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         PlayerArea = GameObject.Find("PlayerArea");
         DropZone = GameObject.Find("DropZone");
         PlayerID = Random.Range(0, 1000);
+        
         GameManager.PlayerList.Add(PlayerID);
         foreach (int x in GameManager.PlayerList)
         {
@@ -30,8 +32,6 @@ public class PlayerManager : NetworkBehaviour
         }
         
     }
-
-
 
     [Server]
     public override void OnStartServer()
@@ -47,12 +47,19 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdDealCards()
     {
-        for (int i = 0; i < 4; i++)
+        GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        if (AllowDraw)
         {
-            GameObject card = Instantiate(cards[Random.Range(0, cards.Count)], new Vector2(0, 0), Quaternion.identity);
-            NetworkServer.Spawn(card, connectionToClient);
-            RpcShowCard(card, "Dealt");
+            GameManager.ChangeReadyClicks();
+            for (int i = 0; i < 4; i++)
+            {
+                GameObject card = Instantiate(cards[Random.Range(0, cards.Count)], new Vector2(0, 0), Quaternion.identity);
+                NetworkServer.Spawn(card, connectionToClient);
+                RpcShowCard(card, "Dealt");
+            }
         }
+        ChangeAllowDraw();
+        RpcGMChangeState("Compile");
     }
 
     public void PlayCard(GameObject card)
@@ -60,15 +67,12 @@ public class PlayerManager : NetworkBehaviour
         CmdPlayCard(card);
     }
 
-    public void SetMyTurn()
-    {
-        CmdSetMyTurn();
-    }
-
     [Command]
 
     void CmdPlayCard(GameObject card)
-    {   
+    {
+        GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        Debug.Log(GameManager.GetCurrentPlayer());
         if (GameManager.GetCurrentPlayer() == PlayerID)
         {
             RpcShowCard(card, "Played");
@@ -76,16 +80,20 @@ public class PlayerManager : NetworkBehaviour
         
     }
 
+
     [Command]
-    void CmdSetMyTurn()
+    public void CmdGMChangeState(string stateRequest)
     {
-        isMyTurn = true;
+        RpcGMChangeState(stateRequest);
     }
+
+
 
     [ClientRpc]
     void RpcShowCard(GameObject card, string type)
     {
-            if (type == "Dealt")
+        GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        if (type == "Dealt")
             {
                 if (hasAuthority)
                 {
@@ -95,11 +103,29 @@ public class PlayerManager : NetworkBehaviour
 
             else if (type == "Played")
             {
+            if (PlayerID == GameManager.GetCurrentPlayer())
+            {
+                Debug.Log(PlayerID + "player id");
+                Debug.Log(GameManager.GetCurrentPlayer() + "current player");
+                Debug.Log("Played");
                 card.transform.SetParent(DropZone.transform, false);
-                GameManager.MoveToNextPlayer();
+                GameManager.CmdMoveToNextPlayer();
+            }
+                
             }
     }
 
+    [ClientRpc]
+    void RpcGMChangeState(string stateRequest)
+    {
+        GameManager.ChangeGameState(stateRequest);
+
+    }
+
+    public void ChangeAllowDraw()
+    {
+        AllowDraw = false;
+    }
 
 
 }
