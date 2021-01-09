@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Client : MonoBehaviour
+public class Client
     //Client starts a new scenario is one isn't running. Handles UI updates. Delegates player logic tasks.
 {
     public Text ScenarioText;
@@ -12,25 +12,31 @@ public class Client : MonoBehaviour
     public Button InteractOption;
     public Button GatherInfoOption;
     public Button SupportOption;
-    private Player Player;
+    private Player Player1;
+    private Player Player2;
     public Scenario Scenario;
+    public Button testMe;
+    bool choicemade;
 
-    void Start()
+/*    void Start()
     {
         Debug.Log("Starting client");
         Player = new Player();
-
         Scenario = new Scenario();
         Scenario.AddClientToList(this);
+        
         DisplayCards();
 
         // TODO: Add confirmation all players are connected, let player decide when to start scenario
         Scenario.StartScenario();
+
+    }*/
+
+    public void CreatePlayer()
+    {
+        Player1 = new Player();
     }
 
-    void Update()
-    {
-    }
 
     public void SetScenarioText(string text)
     {
@@ -109,8 +115,64 @@ public class Client : MonoBehaviour
         Scenario.Support(this);
     }
 
-    public Player GetPlayer()
+/*    public Player GetPlayer()
     {
         return Player;
+    }*/
+
+
+    public IEnumerator Dialog(bool working)
+    {
+        // ...
+        Debug.Log("Dialoging");
+        choicemade = false;
+        var waitForButton = new WaitForUIButtons(AttackOption, InteractOption, GatherInfoOption, SupportOption);
+        yield return new WaitForUIButtons(AttackOption, InteractOption, GatherInfoOption, SupportOption);
+
+        /*yield return waitForButton.Reset();*/
+
+        if (waitForButton.PressedButton == AttackOption)
+        {
+            Debug.Log("Attack from Wait For Button");
+            Attack();
+            working = false;
+            Scenario.EndTurn(this);
+        }
+        if (waitForButton.PressedButton == InteractOption)
+        {
+            Debug.Log("Interact from Wait For Button");
+            Interact();
+            working = false;
+
+        }
+        if (waitForButton.PressedButton == GatherInfoOption)
+        {
+            Debug.Log("GatherInfo from Wait For Button");
+            GatherInfo();
+            working = false;
+        }
+        if (waitForButton.PressedButton == SupportOption)
+        {
+            Debug.Log("Supported from Wait For Button");
+            Support();
+            working = false;
+        }
+
+        while (working)
+        {
+            yield return null;
+        }
+
+        
+        // ...
+    }
+
+    public IEnumerator DoLast(bool working)
+    {
+        while (working)
+        {
+            yield return new WaitForSeconds(0.1f);
+        }
+        Debug.Log("Workin");
     }
 }
