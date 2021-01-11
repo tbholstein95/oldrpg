@@ -17,6 +17,10 @@ public class PlayerManager : NetworkBehaviour
     public bool AllowDraw = true;
     public GameObject button;
 
+    public SyncList<int> PList = new SyncList<int>();
+
+
+
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -24,8 +28,12 @@ public class PlayerManager : NetworkBehaviour
         PlayerArea = GameObject.Find("PlayerArea");
         DropZone = GameObject.Find("DropZone");
         PlayerID = Random.Range(0, 1000);
-        
+        Scenario scenario = new Scenario();
+        GameObject ScenarioText = GameObject.Find("QuestText");
+        ScenarioText.GetComponent<Text>().text = scenario.QuestIntro;
+
         GameManager.PlayerList.Add(PlayerID);
+        PList.Add(PlayerID);
         foreach (int x in GameManager.PlayerList)
         {
             Debug.Log(x);
@@ -43,6 +51,9 @@ public class PlayerManager : NetworkBehaviour
         cards.Add(Card2);
 
     } 
+
+    [SyncVar]
+    public int CurTurn;
 
     [Command]
     public void CmdDealCards()
@@ -109,7 +120,13 @@ public class PlayerManager : NetworkBehaviour
                 Debug.Log(GameManager.GetCurrentPlayer() + "current player");
                 Debug.Log("Played");
                 card.transform.SetParent(DropZone.transform, false);
-                GameManager.CmdMoveToNextPlayer();
+                Debug.Log("Boutta move it");
+                RpcMoveToNextPlayer();
+                Debug.Log(GameManager.GetCurrentPlayer() + "Get current player");
+                foreach (int x in GameManager.PlayerList)
+                {
+                    Debug.Log(x + "player in playerlist");
+                }
             }
                 
             }
@@ -125,6 +142,34 @@ public class PlayerManager : NetworkBehaviour
     public void ChangeAllowDraw()
     {
         AllowDraw = false;
+    }
+
+
+    [ClientRpc]
+    public void RpcMoveToNextPlayer()
+    {
+        int curIndex = GameManager.returnCurrPlayer();
+        int tempIndex = curIndex;
+        int lengthOfList = GameManager.PlayerList.Count;
+        Debug.Log(curIndex.GetType() + "typeof of curIndex");
+        int nextIndex = (curIndex + 1);
+        Debug.Log(lengthOfList + "Length of LIst");
+        Debug.Log(curIndex + "Curr Index");
+        Debug.Log(tempIndex + "temp index");
+        Debug.Log(nextIndex + "next index");
+        if ((nextIndex) < lengthOfList)
+        {
+            Debug.Log("Attempting to move");
+            GameManager.SetNextPlayer(curIndex += 1);
+            Debug.Log("It moved");
+            CurTurn = GameManager.CurrentPlayerTurn;
+            Debug.Log(CurTurn);
+        }
+        else
+        {
+            Debug.Log("Ruh roh, something went wrong with changin it");
+            GameManager.SetNextPlayer(0);
+        }
     }
 
 

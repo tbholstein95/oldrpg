@@ -5,13 +5,14 @@ using Mirror;
 using UnityEngine.UI;
 
 public class GameManager : NetworkBehaviour
-{
-    public List<int> PlayerList = new List<int>();
+{   
+    public SyncList<int> PlayerList = new SyncList<int>();
+
     public string GameState = "Initialize {}";
     private int ReadyClicks = 0;
 
     [SyncVar]
-    private int CurrentPlayerTurn;
+    public int CurrentPlayerTurn;
 
     public int GetCurrentPlayer()
     {
@@ -29,17 +30,28 @@ public class GameManager : NetworkBehaviour
         Debug.Log("Set Next Player " + CurrentPlayerTurn);
     }
 
-    [Command]
-    public void CmdMoveToNextPlayer()
+    public void MoveToNextPlayer()
     {
         int curIndex = PlayerList.IndexOf(CurrentPlayerTurn);
         int lengthOfList = PlayerList.Count;
-        if((curIndex += 1) < lengthOfList)
+        int nextIndex = (curIndex += 1);
+        Debug.Log(lengthOfList + "Length of LIst");
+        Debug.Log(curIndex + "Curr Index");
+        Debug.Log((curIndex += 1) + "Cur Index + 1");
+        Debug.Log(PlayerList[1] + "Playerlist + 1");
+        foreach(int x in PlayerList)
         {
-            SetNextPlayer(curIndex += 1);
+            Debug.Log(x + "Debugging move to next player");
+        }
+        if (nextIndex < lengthOfList)
+        {
+            Debug.Log("Attempting to move");
+            CurrentPlayerTurn = PlayerList[1];
+            Debug.Log("It moved");
         }
         else
         {
+            Debug.Log("Ruh roh, something went wrong with changin it");
             SetNextPlayer(0);
         }
     }
@@ -61,9 +73,7 @@ public class GameManager : NetworkBehaviour
                 Debug.Log("ChangeGameState to Compile");
                 GameState = "Compile";
                 SetFirstPlayer();
-
             }
-
         }
 
         else if (stateRequest == "Execute {}")
@@ -79,6 +89,8 @@ public class GameManager : NetworkBehaviour
         Debug.Log(ReadyClicks);
     }
 
-
-
+    public int returnCurrPlayer()
+    {
+        return PlayerList.IndexOf(CurrentPlayerTurn);
+    }
 }
