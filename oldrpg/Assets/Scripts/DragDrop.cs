@@ -50,7 +50,6 @@ public class DragDrop : NetworkBehaviour
         {
             return;
         }
-
         startPosition = transform.position;
         isDragging = true;
     }
@@ -66,20 +65,24 @@ public class DragDrop : NetworkBehaviour
         {
             NetworkIdentity networkIdentity = NetworkClient.connection.identity;
             PlayerManager = networkIdentity.GetComponent<PlayerManager>();
-            Debug.Log(PlayerManager.PlayerID + "player id");
+            NetworkIdentity playerNetworkIdentityObject = PlayerManager.GetComponent<NetworkIdentity>();
+            uint playerNetID = playerNetworkIdentityObject.netId;
             Debug.Log(GameManager.GetCurrentPlayer() + "current player id");
-            if(PlayerManager.PlayerID == GameManager.GetCurrentPlayer())
+            if (playerNetID == GameManager.CurrentPlayerTurn)
             {
                 transform.SetParent(DropZone.transform, false);
                 isDraggable = false;
                 PlayerManager.PlayCard(gameObject);
+                if (hasAuthority)
+                {
+                    PlayerManager.MoveToNextPlayer();
+                }
+                
             }
             else
             {
                 transform.position = startPosition;
-            }
-            
-            
+            }            
         }
         else
         {
