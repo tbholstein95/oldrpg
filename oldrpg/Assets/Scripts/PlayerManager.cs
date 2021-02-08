@@ -26,44 +26,13 @@ public class PlayerManager : NetworkBehaviour
     public bool AllowDraw = true;
     public GameObject button;
 
-<<<<<<< Updated upstream:oldrpg/Assets/Scripts/PlayerManager.cs
-    public SyncList<int> PList = new SyncList<int>();
-
-
-=======
-    public SyncList<PlayerManager> PlayerList = new SyncList<PlayerManager>();
-    public List<PlayerManager> LPlayerList = new List<PlayerManager>();
-
-    public bool NeedSetFirstPlayer = true;
->>>>>>> Stashed changes:oldrpg/Assets/PlayerManager.cs
-
     public override void OnStartClient()
     {
         base.OnStartClient();
         GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         PlayerArea = GameObject.Find("PlayerArea");
         DropZone = GameObject.Find("DropZone");
-<<<<<<< Updated upstream:oldrpg/Assets/Scripts/PlayerManager.cs
-        PlayerID = Random.Range(0, 1000);
-        Scenario scenario = new Scenario();
-        GameObject ScenarioText = GameObject.Find("QuestText");
-        ScenarioText.GetComponent<Text>().text = scenario.QuestIntro;
 
-        GameManager.PlayerList.Add(PlayerID);
-        PList.Add(PlayerID);
-        foreach (int x in GameManager.PlayerList)
-=======
-        int NewRand = Random.Range(0, 1000);
-        int TempRand = NewRand;
-        PlayerID = TempRand;
-        Debug.Log(PlayerID + "MADE PLAYER ID");
-        GameObject ScenarioText = GameObject.Find("QuestText");
-        Debug.Log("StartedClient");
-        LPlayerList.Add(this);
-
-        Debug.Log(LPlayerList.Count + "Lcount");
-        foreach (PlayerManager x in LPlayerList)
->>>>>>> Stashed changes:oldrpg/Assets/PlayerManager.cs
         {
             Debug.Log(x + "hey man im in the Lplayerlist");
         }
@@ -88,14 +57,6 @@ public class PlayerManager : NetworkBehaviour
         cards.Add(Card2);
     }
 
-
-/*    [ServerCallback]
-
-<<<<<<< Updated upstream:oldrpg/Assets/Scripts/PlayerManager.cs
-    [SyncVar]
-    public int CurTurn;
-
-=======
     void Update()
     {
         if (GameManager.GameState == "Compile" && NeedSetFirstPlayer)
@@ -104,7 +65,7 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 */
->>>>>>> Stashed changes:oldrpg/Assets/PlayerManager.cs
+
     [Command]
     public void CmdDealCards()
     {
@@ -163,32 +124,11 @@ public class PlayerManager : NetworkBehaviour
             }
         else if (type == "Played")
         {
-/*            if (PlayerID == GameManager.GetCurrentPlayer())
-            {
-                Debug.Log(PlayerID + "player id");
-                Debug.Log(CurrentPlayer + "current player");
-                Debug.Log("Played");
-                card.transform.SetParent(DropZone.transform, false);
-<<<<<<< Updated upstream:oldrpg/Assets/Scripts/PlayerManager.cs
-                Debug.Log("Boutta move it");
-                RpcMoveToNextPlayer();
-                Debug.Log(GameManager.GetCurrentPlayer() + "Get current player");
-                foreach (int x in GameManager.PlayerList)
-                {
-                    Debug.Log(x + "player in playerlist");
-                }
-            }
-                
-            }
-=======
-*//*                MoveToNextPlayer();*//*
-            }*/
 
-            /*MoveToNextPlayer();*/
 
 
         }
->>>>>>> Stashed changes:oldrpg/Assets/PlayerManager.cs
+
     }
 
     [ClientRpc]
