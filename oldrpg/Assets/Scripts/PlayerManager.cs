@@ -26,13 +26,13 @@ public class PlayerManager : NetworkBehaviour
     public bool AllowDraw = true;
     public GameObject button;
 
-
     public override void OnStartClient()
     {
         base.OnStartClient();
         GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         PlayerArea = GameObject.Find("PlayerArea");
         DropZone = GameObject.Find("DropZone");
+
         {
             Debug.Log(x + "hey man im in the Lplayerlist");
         }
@@ -56,6 +56,15 @@ public class PlayerManager : NetworkBehaviour
         cards.Add(Card1);
         cards.Add(Card2);
     }
+
+    void Update()
+    {
+        if (GameManager.GameState == "Compile" && NeedSetFirstPlayer)
+        {
+            RpcSetFirstPlayer();
+        }
+    }
+*/
 
     [Command]
     public void CmdDealCards()
@@ -117,7 +126,9 @@ public class PlayerManager : NetworkBehaviour
         {
 
 
+
         }
+
     }
 
     [ClientRpc]
