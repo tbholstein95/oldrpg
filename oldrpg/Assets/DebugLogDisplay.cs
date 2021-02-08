@@ -8,12 +8,12 @@ public class DebugLogDisplay : MonoBehaviour
     public string output = "";
     public string stack = "";
     // Start is called before the first frame update
-    public void onEnable()
+    private void onEnable()
     {
         Application.logMessageReceived += HandleLog;
     }
 
-    public void OnDisable()
+    private void OnDisable()
     {
         Application.logMessageReceived -= HandleLog;
     }
@@ -24,9 +24,9 @@ public class DebugLogDisplay : MonoBehaviour
         stack = stackTrace;
     }
 
-    public void OnGUI()
+    private void OnGUI()
     {
         GUI.Label(new Rect(150, 5, 800, 60), output);
-        GUI.Label(new Rect(150, 60, 800, 60), stack);
+        GUI.Label(new Rect(150, 65, 800, 60), stack);
     }
 }

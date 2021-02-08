@@ -26,6 +26,10 @@ public class PlayerManager : NetworkBehaviour
     public bool AllowDraw = true;
     public GameObject button;
 
+    public SyncList<PlayerManager> PlayerList = new SyncList<PlayerManager>();
+    public List<PlayerManager> LPlayerList = new List<PlayerManager>();
+
+    public bool NeedSetFirstPlayer = true;
 
     public override void OnStartClient()
     {
@@ -33,6 +37,16 @@ public class PlayerManager : NetworkBehaviour
         GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         PlayerArea = GameObject.Find("PlayerArea");
         DropZone = GameObject.Find("DropZone");
+        int NewRand = Random.Range(0, 1000);
+        int TempRand = NewRand;
+        PlayerID = TempRand;
+        Debug.Log(PlayerID + "MADE PLAYER ID");
+        GameObject ScenarioText = GameObject.Find("QuestText");
+        Debug.Log("StartedClient");
+        LPlayerList.Add(this);
+
+        Debug.Log(LPlayerList.Count + "Lcount");
+        foreach (PlayerManager x in LPlayerList)
         {
             Debug.Log(x + "hey man im in the Lplayerlist");
         }
@@ -57,6 +71,17 @@ public class PlayerManager : NetworkBehaviour
         cards.Add(Card2);
     }
 
+
+/*    [ServerCallback]
+
+    void Update()
+    {
+        if (GameManager.GameState == "Compile" && NeedSetFirstPlayer)
+        {
+            RpcSetFirstPlayer();
+        }
+    }
+*/
     [Command]
     public void CmdDealCards()
     {
@@ -115,6 +140,16 @@ public class PlayerManager : NetworkBehaviour
             }
         else if (type == "Played")
         {
+/*            if (PlayerID == GameManager.GetCurrentPlayer())
+            {
+                Debug.Log(PlayerID + "player id");
+                Debug.Log(CurrentPlayer + "current player");
+                Debug.Log("Played");
+                card.transform.SetParent(DropZone.transform, false);
+*//*                MoveToNextPlayer();*//*
+            }*/
+
+            /*MoveToNextPlayer();*/
 
 
         }
@@ -232,33 +267,5 @@ public class PlayerManager : NetworkBehaviour
             CurrentPlayer = PlayerList[index];
             Debug.Log("Set Next Player " + CurrentPlayer);
         }*/
-
-    [ClientRpc]
-    public void RpcMoveToNextPlayer()
-    {
-        int curIndex = GameManager.returnCurrPlayer();
-        int tempIndex = curIndex;
-        int lengthOfList = GameManager.PlayerList.Count;
-        Debug.Log(curIndex.GetType() + "typeof of curIndex");
-        int nextIndex = (curIndex + 1);
-        Debug.Log(lengthOfList + "Length of LIst");
-        Debug.Log(curIndex + "Curr Index");
-        Debug.Log(tempIndex + "temp index");
-        Debug.Log(nextIndex + "next index");
-        if ((nextIndex) < lengthOfList)
-        {
-            Debug.Log("Attempting to move");
-            GameManager.SetNextPlayer(curIndex += 1);
-            Debug.Log("It moved");
-            CurTurn = GameManager.CurrentPlayerTurn;
-            Debug.Log(CurTurn);
-        }
-        else
-        {
-            Debug.Log("Ruh roh, something went wrong with changin it");
-            GameManager.SetNextPlayer(0);
-        }
-    }
-
 
 }

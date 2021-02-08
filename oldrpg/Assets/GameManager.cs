@@ -5,53 +5,41 @@ using Mirror;
 using UnityEngine.UI;
 
 public class GameManager : NetworkBehaviour
-{   
-    public SyncList<int> PlayerList = new SyncList<int>();
+{
+    public SyncList<uint> UList = new SyncList<uint>();
 
     public string GameState = "Initialize {}";
+
     private int ReadyClicks = 0;
 
     [SyncVar]
-    public int CurrentPlayerTurn;
-
-    public int GetCurrentPlayer()
+    public uint CurrentPlayerTurn;
+    public uint GetCurrentPlayer()
     {
         return CurrentPlayerTurn;
     }
-
     public void SetFirstPlayer()
     {
-        CurrentPlayerTurn = PlayerList[0];
+        CurrentPlayerTurn = UList[0];
     }
 
     public void SetNextPlayer(int index)
     {
-        CurrentPlayerTurn = PlayerList[index];
+        CurrentPlayerTurn = UList[index];
         Debug.Log("Set Next Player " + CurrentPlayerTurn);
     }
 
-    public void MoveToNextPlayer()
+    [Command]
+    public void CmdMoveToNextPlayer()
     {
-        int curIndex = PlayerList.IndexOf(CurrentPlayerTurn);
-        int lengthOfList = PlayerList.Count;
-        int nextIndex = (curIndex += 1);
-        Debug.Log(lengthOfList + "Length of LIst");
-        Debug.Log(curIndex + "Curr Index");
-        Debug.Log((curIndex += 1) + "Cur Index + 1");
-        Debug.Log(PlayerList[1] + "Playerlist + 1");
-        foreach(int x in PlayerList)
+        int curIndex = UList.IndexOf(CurrentPlayerTurn);
+        int lengthOfList = UList.Count;
+        if((curIndex += 1) < lengthOfList)
         {
-            Debug.Log(x + "Debugging move to next player");
-        }
-        if (nextIndex < lengthOfList)
-        {
-            Debug.Log("Attempting to move");
-            CurrentPlayerTurn = PlayerList[1];
-            Debug.Log("It moved");
+            SetNextPlayer(curIndex += 1);
         }
         else
         {
-            Debug.Log("Ruh roh, something went wrong with changin it");
             SetNextPlayer(0);
         }
     }
@@ -68,7 +56,7 @@ public class GameManager : NetworkBehaviour
         else if (stateRequest == "Compile")
         {
             Debug.Log("CHange game state made it to stateRequest of Compile");
-            if (ReadyClicks == (PlayerList.Count))
+            if (ReadyClicks == (UList.Count))
             {
                 Debug.Log("ChangeGameState to Compile");
                 GameState = "Compile";
@@ -87,10 +75,5 @@ public class GameManager : NetworkBehaviour
         ReadyClicks += 1;
         Debug.Log("Adding a ready click");
         Debug.Log(ReadyClicks);
-    }
-
-    public int returnCurrPlayer()
-    {
-        return PlayerList.IndexOf(CurrentPlayerTurn);
     }
 }
